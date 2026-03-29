@@ -1,4 +1,5 @@
 using UnityEngine;
+using UnityEngine.SceneManagement;
 using UnityEngine.UIElements;
 
 public class EnnemyPatrol : MonoBehaviour
@@ -15,22 +16,35 @@ public class EnnemyPatrol : MonoBehaviour
         rb = GetComponent<Rigidbody2D>();
         anim = GetComponent<Animator>();
         currentPoint = _pointB.transform;
-        anim.SetBool("IsRunning", true);
-        transform.position = _pointA.transform.position;
     }
 
-    private void Update()
+    private void FixedUpdate()
     {
-        Vector2 point = currentPoint.position - transform.position;
-        if (currentPoint.position.x >= _pointB.transform.position.x)
-            rb.linearVelocity = new Vector2(-movespeed, 0);
-        else
-            rb.linearVelocity = new Vector2(movespeed, 0);
-
-        if (Vector2.Distance(transform.position, currentPoint.position) < 10f && currentPoint == _pointB.transform)
-            currentPoint = _pointA.transform;
-
-        if (Vector2.Distance(transform.position, currentPoint.position) < 10f && currentPoint == _pointA.transform)
+        float gravity = rb.linearVelocityY;
+        Vector2 point = transform.position;
+        if (point.x < currentPoint.position.x && currentPoint == _pointA.transform)
+        {
             currentPoint = _pointB.transform;
+        }
+        else if (point.x >= currentPoint.position.x && currentPoint == _pointA.transform)
+        {
+            rb.linearVelocity = new Vector2(-movespeed, gravity);
+            transform.localScale = new Vector2(1, 1);
+            
+        }
+        else if (point.x > currentPoint.position.x && currentPoint == _pointB.transform)
+        {
+            currentPoint = _pointA.transform;
+        }
+        else if (point.x <= currentPoint.position.x && currentPoint == _pointB.transform)
+        {
+            rb.linearVelocity = new Vector2(movespeed, gravity);
+            transform.localScale = new Vector2(-1, 1);
+        }
+    }
+    void OnCollisionEnter2D(Collision2D collision)
+    {
+        if (collision.collider.CompareTag("Player"))
+            SceneManager.LoadScene(0);
     }
 }

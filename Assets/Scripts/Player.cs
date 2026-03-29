@@ -18,8 +18,12 @@ public class Player : MonoBehaviour
     [SerializeField] float _jumpVelocity = 5f;
     [SerializeField] float _footOffset = 0.1f;
     [SerializeField] float _jumpTime = 0.25f;
+    [SerializeField] float dashingPower = 24f;
+    [SerializeField] float dashingTime = 0.2f;
+    [SerializeField] float dashingCooldown = 1f;
     [SerializeField] bool _isGrounded;
     [SerializeField] bool _isWalled;
+    [SerializeField] bool canDash = true;
     public int CoinCount = 0;
 
     SpriteRenderer _spriteRenderer;
@@ -28,10 +32,6 @@ public class Player : MonoBehaviour
     float _endJump;
     float xinput;
     float yinput;
-    float dashingPower = 24f;
-    float dashingTime = 0.2f;
-    float dashingCooldown = 1f;
-    bool canDash = true;
     bool isDashing;
     int _jumplimit;
 
