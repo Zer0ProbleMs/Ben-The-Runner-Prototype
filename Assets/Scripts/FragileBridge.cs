@@ -6,10 +6,14 @@ public class FragileBridge : MonoBehaviour
     Animator _anim;
     AudioSource _audio;
     float _timer;
+    [SerializeField] GameObject player;
+    Collider2D _collider;
+
     private void Awake()
     {
         _anim = GetComponent<Animator>();
         _audio = GetComponent<AudioSource>();
+        _collider = GetComponent<Collider2D>();
     }
     private void OnCollisionEnter2D(Collision2D collision)
     {

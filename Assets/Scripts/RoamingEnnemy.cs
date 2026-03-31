@@ -12,6 +12,8 @@ public class RoamingEnnemy : MonoBehaviour
     [SerializeField] bool wallleft;
     [SerializeField] float _footOffset = 0.1f;
     [SerializeField] bool _noGroundleft;
+    [SerializeField] BoxCollider2D weakspot;
+    [SerializeField] BoxCollider2D playerkill;
 
     private void Awake()
     {
@@ -25,9 +27,9 @@ public class RoamingEnnemy : MonoBehaviour
         Gizmos.color = Color.red;
 
         //All the ground checks
-        Vector2 origin = new Vector2(transform.position.x - _footOffset, transform.position.y - _spriteRenderer.bounds.extents.y);
+        Vector2 origin = new Vector2(transform.position.x - _footOffset, transform.position.y - _spriteRenderer.bounds.extents.y); //Left
         Gizmos.DrawLine(origin, origin + Vector2.down * 0.2f);
-        origin = new Vector2(transform.position.x + _footOffset, transform.position.y - _spriteRenderer.bounds.extents.y);
+        origin = new Vector2(transform.position.x + _footOffset, transform.position.y - _spriteRenderer.bounds.extents.y); //Right
         Gizmos.DrawLine(origin, origin + Vector2.down * 0.2f);
 
         //All the wall checks
@@ -72,12 +74,12 @@ public class RoamingEnnemy : MonoBehaviour
 
     void GroundCheck()
     {
-        Vector2 origin = new Vector2(transform.position.x + _footOffset, transform.position.y - _spriteRenderer.bounds.extents.y);
+        Vector2 origin = new Vector2(transform.position.x + _footOffset, transform.position.y - _spriteRenderer.bounds.extents.y); //Right
         RaycastHit2D ground = Physics2D.Raycast(origin, Vector2.down, 0.2f, _mask);
         if (!ground.collider)
             _noGroundleft = false;
 
-        origin = new Vector2(transform.position.x - _footOffset, transform.position.y - _spriteRenderer.bounds.extents.y);
+        origin = new Vector2(transform.position.x - _footOffset, transform.position.y - _spriteRenderer.bounds.extents.y); //Left
         ground = Physics2D.Raycast(origin, Vector2.down, 0.2f, _mask);
         if (!ground.collider)
             _noGroundleft = true;
@@ -85,7 +87,7 @@ public class RoamingEnnemy : MonoBehaviour
 
     private void OnCollisionEnter2D(Collision2D collision)
     {
-        if (collision.collider.CompareTag("Player"))
+        if (collision.collider.CompareTag("Player") && collision.collider == playerkill)
             SceneManager.LoadScene(0);
     }
 }
