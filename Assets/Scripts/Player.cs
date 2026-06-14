@@ -4,12 +4,14 @@ using Unity.Cinemachine;
 using Unity.VisualScripting;
 using UnityEngine;
 using UnityEngine.SceneManagement;
+using UnityEngine.UI;
 using static UnityEngine.UI.Image;
 
 public class Player : MonoBehaviour
 {
     [SerializeField] TrailRenderer _tr;
     [SerializeField] AudioSource pickupsound;
+    [SerializeField] Text ScoreText;
     [SerializeField] AudioSource jump1;
     [SerializeField] AudioSource jump2;
     [SerializeField] AudioSource dash;
@@ -67,6 +69,7 @@ public class Player : MonoBehaviour
         GroundCheck();
         WallCheck();
         DeathFall();
+        UpdateScore();
 
         if (isDashing)
             return;
@@ -154,6 +157,7 @@ public class Player : MonoBehaviour
         RaycastHit2D wall = Physics2D.Raycast(origin, Vector2.left, 0.2f, _mask);
         if (!_isGrounded && wall.collider)
             _isWalled = true;
+
         origin = new Vector2(transform.position.x + _spriteRenderer.bounds.extents.x - 0.3f, transform.position.y); //Right
         wall = Physics2D.Raycast(origin, Vector2.right, 0.2f, _mask);
         if (!_isGrounded && wall.collider)
@@ -193,5 +197,12 @@ public class Player : MonoBehaviour
     {
         if (transform.position.y <= -20f)
             SceneManager.LoadScene(0);
+    }
+
+    void UpdateScore()
+    {
+        int scorecoins = CoinCount * 10;
+        
+        ScoreText.text = Convert.ToString(scorecoins);
     }
 }

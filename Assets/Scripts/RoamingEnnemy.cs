@@ -9,9 +9,10 @@ public class RoamingEnnemy : MonoBehaviour
     Rigidbody2D rb;
     [SerializeField] LayerMask _mask;
     [SerializeField] float movespeed = 3f;
-    [SerializeField] bool wallleft;
+    [SerializeField] bool obstacle;
+    [SerializeField] bool grounded;
+    [SerializeField] float direction = -1f;
     [SerializeField] float _footOffset = 0.1f;
-    [SerializeField] bool _noGroundleft;
     [SerializeField] BoxCollider2D weakspot;
     [SerializeField] BoxCollider2D playerkill;
 
@@ -19,6 +20,11 @@ public class RoamingEnnemy : MonoBehaviour
     {
         _spriteRenderer = GetComponent<SpriteRenderer>();
         rb = GetComponent<Rigidbody2D>();
+    }
+
+    private void Start()
+    {
+        direction = -1;
     }
 
     private void OnDrawGizmos()
@@ -41,18 +47,18 @@ public class RoamingEnnemy : MonoBehaviour
 
     private void Update()
     {
+        grounded = true;
+
         WallCheck();
         GroundCheck();
-        if (wallleft || _noGroundleft)
-        {
-            transform.localScale = new Vector2(-1, 1);
-            rb.linearVelocity = new Vector2(movespeed, rb.linearVelocityY);
-        }
-        else if (!wallleft || !_noGroundleft)
-        {
-            transform.localScale = new Vector2(1, 1);
-            rb.linearVelocity = new Vector2(-movespeed, rb.linearVelocityY);
-        }
+
+        rb.linearVelocity = new Vector2(direction * movespeed, rb.linearVelocityY);
+
+        if (direction == 1f)
+            _spriteRenderer.flipX = true;
+        else
+            _spriteRenderer.flipX = false;
+
     }
 
     void WallCheck()
@@ -60,34 +66,35 @@ public class RoamingEnnemy : MonoBehaviour
         Vector2 origin = new Vector2(transform.position.x - _spriteRenderer.bounds.extents.x + 0.5f, transform.position.y - 0.5f); //Left
         RaycastHit2D wall = Physics2D.Raycast(origin, Vector2.left, 0.2f, _mask);
         if (wall.collider)
-        {
-            wallleft = true;
-        }
+            direction = 1f;
 
         origin = new Vector2(transform.position.x + _spriteRenderer.bounds.extents.x - 0.5f, transform.position.y - 0.5f); //Right
         wall = Physics2D.Raycast(origin, Vector2.right, 0.2f, _mask);
         if (wall.collider)
-        {
-            wallleft = false;
-        }
+            direction = -1f;
     }
 
     void GroundCheck()
     {
-        Vector2 origin = new Vector2(transform.position.x + _footOffset, transform.position.y - _spriteRenderer.bounds.extents.y); //Right
-        RaycastHit2D ground = Physics2D.Raycast(origin, Vector2.down, 0.2f, _mask);
-        if (!ground.collider)
-            _noGroundleft = false;
+        Vector2 origin = new Vector2(transform.position.x - _footOffset, transform.position.y - _spriteRenderer.bounds.extents.y); //Left
+        RaycastHit2D groundleft = Physics2D.Raycast(origin, Vector2.down, 0.2f, _mask);
+        if (!groundleft.collider)
+            direction = 1f;
 
-        origin = new Vector2(transform.position.x - _footOffset, transform.position.y - _spriteRenderer.bounds.extents.y); //Left
-        ground = Physics2D.Raycast(origin, Vector2.down, 0.2f, _mask);
-        if (!ground.collider)
-            _noGroundleft = true;
+        origin = new Vector2(transform.position.x + _footOffset, transform.position.y - _spriteRenderer.bounds.extents.y); //Right
+        RaycastHit2D groundright = Physics2D.Raycast(origin, Vector2.down, 0.2f, _mask);
+        if (!groundright.collider)
+            direction = -1f;
+
+        origin = new Vector2(transform.position.x + _footOffset, transform.position.y - _spriteRenderer.bounds.extents.y); //Right
+        RaycastHit2D groundcenter = Physics2D.Raycast(origin, Vector2.down, 0.2f, _mask);
+        if (!groundcenter.collider)
+            grounded = false;
     }
 
     private void OnCollisionEnter2D(Collision2D collision)
     {
-        if (collision.collider.CompareTag("Player") && collision.collider == playerkill)
+        if (collision.collider.CompareTag("Player"))
             SceneManager.LoadScene(0);
     }
 }

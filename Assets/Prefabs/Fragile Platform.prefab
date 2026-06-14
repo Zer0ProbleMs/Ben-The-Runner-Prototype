@@ -14,7 +14,7 @@ GameObject:
   - component: {fileID: 9033683990042695722}
   - component: {fileID: 2555774967493235412}
   - component: {fileID: 3837952820653038809}
-  m_Layer: 0
+  m_Layer: 11
   m_Name: Fragile Platform
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -175,6 +175,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 58645bcfddfbf0c498220382925cb5fe, type: 3}
   m_Name: 
   m_EditorClassIdentifier: '::'
+  player: {fileID: 0}
 --- !u!82 &3837952820653038809
 AudioSource:
   m_ObjectHideFlags: 0
