@@ -18,9 +18,16 @@ public class PlayerNew : MonoBehaviour
     [Header("Jumping Properties")]
     public bool isJumping;
     public float jumpForce = 10f;
-    public int maxJump = 1;
+    public int maxJump = 2;
 
     private int _jumpRemaining;
+
+    [Header("WallJumping Properties")] 
+    public Vector2 wallJumpPower = new Vector2(5f, 10f);
+    public float wallJumpDirection;
+    public bool isWallJumping = false;
+    public float wallJumpTime = 0.5f;
+    public float wallJumpTimer;
 
     [Header("GroundCheck")]
     public Transform groundCheckPos;
@@ -39,8 +46,7 @@ public class PlayerNew : MonoBehaviour
     public float fallGravity = 4f;
     public float fallSpeed = -18f;
     public float walledFallSpeed = -1;
-    
-    private float _defaultFallSpeed;
+    public float defaultFallSpeed;
 
     [Header("Character Flip")] 
     public float playerScale;
@@ -50,50 +56,73 @@ public class PlayerNew : MonoBehaviour
     private void Start()
     {
         _movementSpeed = defaultSpeed;
-        _defaultFallSpeed = fallSpeed;
+        defaultFallSpeed = fallSpeed;
     }
 
-    // Update is called once per frame
+    // FixedUpdate updates every 50 frames
     void FixedUpdate()
     {
-        Movement();
         Gravity();
+        WallSlide();
         GroundCheck();
         WallCheck();
-        FlipChar();
+        WallJump();
+        if (!isWallJumping)
+        {
+            Movement();
+            FlipChar();
+        }
     }
 
     public void MoveInput(InputAction.CallbackContext context)
     {
-        _horizontalInput = context.ReadValue<Vector2>().x;
+        _horizontalInput = context.ReadValue<Vector2>().x; // Takes the input on the X axis so Q and D
     }
 
     public void JumpInput(InputAction.CallbackContext context)
     {
-        if (context.performed && _jumpRemaining > 0)
+        if (context.performed && _jumpRemaining > 0 && !isWalled) // Takes the input of Space
         {
             isJumping = true;
             Jump();
             _jumpRemaining--;
         }
 
-        if (context.canceled)
+        else if (context.canceled) // Checks if the input has been canceled
         {
-            isJumping = false;
-            rb.linearVelocityY *= 0.5f;
+            isJumping = false; 
+            rb.linearVelocityY *= 0.5f; // If it is, we reduce the jump height
+            _jumpRemaining--;
+        }
+
+        if (context.performed && wallJumpTimer > 0f)
+        {
+            isWallJumping = true;
+            rb.linearVelocity = new Vector2(wallJumpDirection * wallJumpPower.x, wallJumpPower.y);
+            wallJumpTimer = 0f;
+
+            if (transform.localScale.x != wallJumpDirection)
+            {
+                _isFacingRight = !_isFacingRight;
+                Vector3 ls = transform.localScale;
+                ls.x *= -1;
+                transform.localScale = ls;
+            }
+            
+            Invoke(nameof(CancelWallJump), wallJumpTime + 0.1f);
         }
     }
 
     public void RunInput(InputAction.CallbackContext context)
     {
-        if (context.performed)
+        if (context.performed) // If the player is holding Shift
         {
-            _movementSpeed = runSpeed;
+            _movementSpeed = runSpeed; // They run
         }
 
-        if (context.canceled)
+        if (context.canceled) // If the player stopped holding Shift
         {
-            _movementSpeed = defaultSpeed;
+            _movementSpeed = defaultSpeed; // They walk
         }
     }
 
@@ -110,7 +139,7 @@ public class PlayerNew : MonoBehaviour
     private void Gravity()
     {
         rb.gravityScale = defaultGravity;
-
+        
         if (rb.linearVelocityY < 0)
         {
             rb.gravityScale = fallGravity;
@@ -128,16 +157,36 @@ public class PlayerNew : MonoBehaviour
         else isGrounded = false;
     }
 
-    private void WallCheck()
+    private bool WallCheck()
     {
-        isWalled = false;
-        
-        if (Physics2D.OverlapBox(wallCheckPos.position, wallCheckSize, 0, wallCheckMask) && !isGrounded)
+        return (Physics2D.OverlapBox(wallCheckPos.position, wallCheckSize, 0, wallCheckMask) && !isGrounded);
+    }
+
+    private void WallSlide()
+    {
+        if (!isGrounded && WallCheck() && _horizontalInput != 0)
         {
-            fallSpeed = walledFallSpeed;
             isWalled = true;
+            rb.linearVelocityY = Mathf.Max(rb.linearVelocityY, walledFallSpeed);
         }
-        fallSpeed = _defaultFallSpeed;
+        else isWalled = false;
+    }
+
+    private void WallJump()
+    {
+        if (isWalled)
+        {
+            isWallJumping = false;
+            wallJumpDirection = -transform.localScale.x;
+            wallJumpTimer = wallJumpTime;
+            CancelInvoke();
+        }
+        else if (wallJumpTimer > 0f) wallJumpTimer -= Time.deltaTime;
+    }
+
+    private void CancelWallJump()
+    {
+        isWallJumping = false;
     }
 
     private void FlipChar()
