@@ -9,12 +9,16 @@ using static UnityEngine.UI.Image;
 
 public class Player : MonoBehaviour
 {
+    [Header("Importation")]
     [SerializeField] TrailRenderer _tr;
     [SerializeField] AudioSource pickupsound;
     [SerializeField] Text ScoreText;
     [SerializeField] AudioSource jump1;
     [SerializeField] AudioSource jump2;
     [SerializeField] AudioSource dash;
+    [SerializeField] GameObject startPoint;
+    
+    [Header("Variables")]
     [SerializeField] LayerMask _mask;
     [SerializeField] float _hspeed = 4f;
     [SerializeField] float _sprintmult = 1.5f;
@@ -27,7 +31,9 @@ public class Player : MonoBehaviour
     [SerializeField] bool _isGrounded;
     [SerializeField] bool _isWalled;
     [SerializeField] bool canDash = true;
+    [SerializeField] bool canMove;
     public int CoinCount = 0;
+    public Vector3 spawnPoint;
 
     SpriteRenderer _spriteRenderer;
     Rigidbody2D _rb;
@@ -37,12 +43,18 @@ public class Player : MonoBehaviour
     float yinput;
     bool isDashing;
     int _jumplimit;
-
+    
     private void Awake() //Used for caching different components even before start
     {
         _spriteRenderer = GetComponent<SpriteRenderer>();
         _rb = GetComponent<Rigidbody2D>();
         anim = GetComponent<Animator>();
+        spawnPoint = startPoint.transform.position;
+    }
+
+    private void Start()
+    {
+        gameObject.transform.position = spawnPoint;
     }
 
     private void OnDrawGizmos() //Used to see where the Raycasts would be and how long
@@ -68,12 +80,25 @@ public class Player : MonoBehaviour
     {
         GroundCheck();
         WallCheck();
-        DeathFall();
         UpdateScore();
-
+        if (transform.position.y <= -20f)
+            Death();
+        
         if (isDashing)
             return;
+        
+        PlayerMovement();
+        UpdateSprite();
+    }
 
+    private void FixedUpdate()
+    {
+        if (isDashing)
+            return;
+    }
+
+    void PlayerMovement()
+    {
         xinput = Input.GetAxis("Horizontal") * _hspeed;
         yinput = _rb.linearVelocityY;
 
@@ -103,14 +128,6 @@ public class Player : MonoBehaviour
 
         if (!isDashing)
             _rb.linearVelocity = new Vector2(xinput, yinput);
-
-        UpdateSprite();
-    }
-
-    private void FixedUpdate()
-    {
-        if (isDashing)
-            return;
     }
 
     void UpdateSprite()
@@ -193,10 +210,9 @@ public class Player : MonoBehaviour
         canDash = true;
     }
 
-    void DeathFall()
+    public void Death()
     {
-        if (transform.position.y <= -20f)
-            SceneManager.LoadScene(0);
+        gameObject.transform.position = spawnPoint;
     }
 
     void UpdateScore()
@@ -205,4 +221,5 @@ public class Player : MonoBehaviour
         
         ScoreText.text = Convert.ToString(scorecoins);
     }
+    
 }

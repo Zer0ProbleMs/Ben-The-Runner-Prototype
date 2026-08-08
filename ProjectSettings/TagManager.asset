@@ -7,6 +7,8 @@ TagManager:
   - Ground
   - KillPlayer
   - Button
+  - Ennemy
+  - CheckPoint
   layers:
   - Default
   - TransparentFX
@@ -19,8 +21,8 @@ TagManager:
   - Saws
   - Ennemies
   - Pickables
-  - Map
-  - 
+  - Ground
+  - Wall
   - 
   - 
   - 

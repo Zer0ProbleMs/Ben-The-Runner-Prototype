@@ -7,6 +7,7 @@ public class RoamingEnnemy : MonoBehaviour
 {
     SpriteRenderer _spriteRenderer;
     Rigidbody2D rb;
+    Player _player;
     [SerializeField] LayerMask _mask;
     [SerializeField] float movespeed = 3f;
     [SerializeField] bool obstacle;
@@ -20,6 +21,7 @@ public class RoamingEnnemy : MonoBehaviour
     {
         _spriteRenderer = GetComponent<SpriteRenderer>();
         rb = GetComponent<Rigidbody2D>();
+        _player = FindObjectOfType<Player>();
     }
 
     private void Start()
@@ -47,7 +49,7 @@ public class RoamingEnnemy : MonoBehaviour
 
     private void Update()
     {
-        grounded = true;
+        grounded = true; // Could be converted in INT to make him stop moving during fall and animations too
 
         WallCheck();
         GroundCheck();
@@ -91,10 +93,11 @@ public class RoamingEnnemy : MonoBehaviour
         if (!groundcenter.collider)
             grounded = false;
     }
-
+    
     private void OnCollisionEnter2D(Collision2D collision)
     {
         if (collision.collider.CompareTag("Player"))
-            SceneManager.LoadScene(0);
+            _player.Death();
     }
+
 }

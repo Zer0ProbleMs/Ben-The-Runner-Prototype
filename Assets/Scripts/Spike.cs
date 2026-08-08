@@ -6,17 +6,19 @@ public class Spike : MonoBehaviour
 {
     Animator _anim;
     AudioSource _audio;
+    Player _player;
     bool playerpresent = false;
 
     private void Awake()
     {
         _anim = GetComponent<Animator>();
         _audio = GetComponent<AudioSource>();
+        _player = FindObjectOfType<Player>();
     }
     void OnCollisionEnter2D(Collision2D collision)
     {
         if (collision.collider.CompareTag("Player"))
-            SceneManager.LoadScene(0);
+            _player.Death();
     }
     void OnTriggerEnter2D(Collider2D collision)
     {
