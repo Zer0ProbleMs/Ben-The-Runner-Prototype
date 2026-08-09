@@ -1,3 +1,4 @@
+using System.Collections;
 using UnityEngine;
 using UnityEngine.InputSystem;
 
@@ -5,6 +6,8 @@ public class PlayerNew : MonoBehaviour
 {
     [Header("GameObjects Import")] 
     public Rigidbody2D rb;
+
+    private Animator _animator;
     
     [Header("Movement Properties")] 
     public float defaultSpeed = 5f;
@@ -14,6 +17,16 @@ public class PlayerNew : MonoBehaviour
     
     [Header("Running Properties")] 
     public float runSpeed = 7f;
+
+    private bool _isRunning = false;
+
+    [Header("Dashing Properties")] 
+    public float dashPower = 10f;
+    public float dashTime = 0.5f;
+    public float dashWait = 1f;
+    public bool canDash = true;
+
+    private bool _isDashing;
     
     [Header("Jumping Properties")]
     public bool isJumping;
@@ -21,11 +34,12 @@ public class PlayerNew : MonoBehaviour
     public int maxJump = 2;
 
     private int _jumpRemaining;
+    private bool _isJumping;
 
     [Header("WallJumping Properties")] 
     public Vector2 wallJumpPower = new Vector2(5f, 10f);
     public float wallJumpDirection;
-    public bool isWallJumping = false;
+    public bool isWallJumping;
     public float wallJumpTime = 0.5f;
     public float wallJumpTimer;
 
@@ -44,19 +58,24 @@ public class PlayerNew : MonoBehaviour
     [Header("Gravity")] 
     public float defaultGravity = 2f;
     public float fallGravity = 4f;
+    public float downFall = 6f;
     public float fallSpeed = -18f;
     public float walledFallSpeed = -1;
-    public float defaultFallSpeed;
 
+    private bool _isDowning;
+    
     [Header("Character Flip")] 
     public float playerScale;
     private bool _isFacingRight;
-    
+
+    private void Awake()
+    {
+        _animator = GetComponent<Animator>();
+    }
     
     private void Start()
     {
         _movementSpeed = defaultSpeed;
-        defaultFallSpeed = fallSpeed;
     }
 
     // FixedUpdate updates every 50 frames
@@ -67,7 +86,11 @@ public class PlayerNew : MonoBehaviour
         GroundCheck();
         WallCheck();
         WallJump();
-        if (!isWallJumping)
+        Animations();
+        
+        if (_isDashing) Dashing();
+        
+        if (!isWallJumping && !_isDashing)
         {
             Movement();
             FlipChar();
@@ -118,11 +141,33 @@ public class PlayerNew : MonoBehaviour
         if (context.performed) // If the player is holding Shift
         {
             _movementSpeed = runSpeed; // They run
+            _isRunning = true;
         }
 
         if (context.canceled) // If the player stopped holding Shift
         {
             _movementSpeed = defaultSpeed; // They walk
+            _isRunning = false;
+        }
+    }
+
+    public void DashInput(InputAction.CallbackContext context)
+    {
+        if (context.performed && canDash)
+        {
+            StartCoroutine(nameof(Dash));
+        }
+    }
+
+    public void DownInput(InputAction.CallbackContext context)
+    {
+        if (context.performed)
+        {
+            _isDowning = true;
+        }
+        else if (context.canceled)
+        {
+            _isDowning = false;
         }
     }
 
@@ -145,6 +190,12 @@ public class PlayerNew : MonoBehaviour
             rb.gravityScale = fallGravity;
             rb.linearVelocityY = Mathf.Max(rb.linearVelocityY, fallSpeed);
         }
+
+        if (_isDowning)
+        {
+            rb.gravityScale = downFall;
+            rb.linearVelocityY = Mathf.Max(rb.linearVelocityY, fallSpeed);
+        }
     }
 
     private void GroundCheck()
@@ -152,9 +203,15 @@ public class PlayerNew : MonoBehaviour
         if (Physics2D.OverlapBox(groundCheckPos.position, groundCheckSize, 0, groundCheckMask))
         {
             isGrounded = true;
+            _isJumping = false;
             _jumpRemaining = maxJump;
         }
-        else isGrounded = false;
+        else
+        {
+            _isJumping = true;
+            isGrounded = false;
+        }
+        
     }
 
     private bool WallCheck()
@@ -189,6 +246,21 @@ public class PlayerNew : MonoBehaviour
         isWallJumping = false;
     }
 
+    private IEnumerator Dash()
+    {
+        canDash = false;
+        _isDashing = true;
+        yield return new WaitForSeconds(dashTime);
+        _isDashing = false;
+        yield return new WaitForSeconds(dashWait);
+        canDash = true;
+    }
+
+    private void Dashing()
+    {
+        rb.linearVelocity = new Vector2(transform.localScale.x * dashPower, 0);
+    }
+
     private void FlipChar()
     {
         if (_horizontalInput > 0 && _isFacingRight || _horizontalInput < 0 && !_isFacingRight)
@@ -198,6 +270,15 @@ public class PlayerNew : MonoBehaviour
             ls.x *= -1;
             transform.localScale = ls;
         }
+    }
+
+    private void Animations()
+    {
+        _animator.SetFloat("Horizontal Speed", Mathf.Abs(_horizontalInput));
+        _animator.SetFloat("Vertical Speed", rb.linearVelocityY);
+        _animator.SetBool("IsGrounded", isGrounded);
+        _animator.SetBool("IsRunning", _isRunning);
+        _animator.SetBool("IsJumping", _isJumping);
     }
 
     private void OnDrawGizmosSelected()

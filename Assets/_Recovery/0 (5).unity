@@ -1151,24 +1151,8 @@ MonoBehaviour:
           m_StringArgument: 
           m_BoolArgument: 0
         m_CallState: 2
-    m_ActionId: 6cc01602-d520-4c3c-8aeb-33e661fca44c
+    m_ActionId: d956aa44-3985-4f61-8232-7a250984d79d
     m_ActionName: 'Player/Dash[/Keyboard/leftAlt]'
-  - m_PersistentCalls:
-      m_Calls:
-      - m_Target: {fileID: 267373529}
-        m_TargetAssemblyTypeName: PlayerNew, Assembly-CSharp
-        m_MethodName: DownInput
-        m_Mode: 0
-        m_Arguments:
-          m_ObjectArgument: {fileID: 0}
-          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
-          m_IntArgument: 0
-          m_FloatArgument: 0
-          m_StringArgument: 
-          m_BoolArgument: 0
-        m_CallState: 2
-    m_ActionId: 612da994-29fd-4f35-9003-9db015ac7c46
-    m_ActionName: 'Player/Down[/Keyboard/s]'
   m_NeverAutoSwitchControlSchemes: 0
   m_DefaultControlScheme: 
   m_DefaultActionMap: 
@@ -1629,7 +1613,7 @@ Animator:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 267373518}
-  m_Enabled: 1
+  m_Enabled: 0
   m_Avatar: {fileID: 0}
   m_Controller: {fileID: 9100000, guid: a678c8c6895a60d49828d12dea295617, type: 2}
   m_CullingMode: 0
@@ -1762,9 +1746,9 @@ MonoBehaviour:
   rb: {fileID: 267373526}
   defaultSpeed: 5
   runSpeed: 8
-  dashPower: 18
-  dashTime: 0.2
-  dashWait: 1.5
+  dashPower: 10
+  dashTime: 0.5
+  dashWait: 1
   canDash: 1
   isJumping: 0
   jumpForce: 10
@@ -1775,7 +1759,7 @@ MonoBehaviour:
   wallJumpTime: 0.3
   wallJumpTimer: 0.3
   groundCheckPos: {fileID: 409858103}
-  groundCheckSize: {x: 1.75, y: 0.25}
+  groundCheckSize: {x: 1, y: 0.25}
   groundCheckMask:
     serializedVersion: 2
     m_Bits: 2048
@@ -1788,9 +1772,9 @@ MonoBehaviour:
   isWalled: 0
   defaultGravity: 2
   fallGravity: 4
-  downFall: 6
   fallSpeed: -18
   walledFallSpeed: -1
+  defaultFallSpeed: 0
   playerScale: 1
 --- !u!1 &273919132
 GameObject:
@@ -43442,7 +43426,7 @@ Transform:
   m_GameObject: {fileID: 1524587276}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0, y: -0.004322052, z: 0}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children:
