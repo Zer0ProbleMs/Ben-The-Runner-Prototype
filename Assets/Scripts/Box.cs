@@ -1,17 +1,13 @@
-using Unity.VisualScripting;
-using UnityEditor;
 using System;
 using UnityEngine;
 
 public class Box : MonoBehaviour
 {
     [SerializeField] Sprite brokenBox;
-    SpriteRenderer _sr;
     Rigidbody2D _rb;
     void Awake()
     {
         _rb = GetComponent<Rigidbody2D>();
-        _sr = GetComponent<SpriteRenderer>();
     }
     void Update()
     {
@@ -23,7 +19,7 @@ public class Box : MonoBehaviour
     void OnCollisionEnter2D(Collision2D collision)
     {
         Debug.Log(Math.Abs(collision.relativeVelocity.y));
-        if (Math.Abs(collision.relativeVelocity.y) > 15)
+        if (Math.Abs(collision.relativeVelocity.y) > 18)
         {
             GetComponent<Animator>().SetBool("IsBroken", true);
             _rb.linearVelocityY = 5;

@@ -6,10 +6,9 @@ public class CoinPick : MonoBehaviour
     {
         if (collision.CompareTag("Player"))
         {
-            Player player = collision.GetComponent<Player>();
+            PlayerNew player = collision.GetComponent<PlayerNew>();
             if (player != null)
             {
-                player.AddCoin();
                 Destroy(gameObject);
             }
         }

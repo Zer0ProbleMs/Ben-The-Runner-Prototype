@@ -3,8 +3,12 @@ using UnityEngine;
 
 public class Checkpoint : MonoBehaviour
 {
-    [SerializeField] Player _player;   
-    Vector3 currentPosition;
+    [Header("Importations")]
+    [SerializeField] PlayerNew player;
+    [SerializeField] Animator _animator;
+    
+    [Header("Positions")]
+    Vector2 currentPosition;
     
     private void Start()
     {
@@ -15,7 +19,8 @@ public class Checkpoint : MonoBehaviour
     {
         if (other.CompareTag("Player"))
         {
-            _player.spawnPoint = currentPosition;
+            player.spawnPoint = currentPosition;
+            _animator.SetBool("Flag Touched", true);
         }
     }
 }

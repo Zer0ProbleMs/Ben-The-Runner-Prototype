@@ -10,7 +10,7 @@ GameObject:
   m_Component:
   - component: {fileID: 1821010255061930981}
   - component: {fileID: 1957623789207702635}
-  m_Layer: 0
+  m_Layer: 11
   m_Name: MBridge
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -107,6 +107,10 @@ PrefabInstance:
       propertyPath: m_Name
       value: Bridge 3x1 Variant
       objectReference: {fileID: 0}
+    - target: {fileID: 3891921280330746194, guid: 1ebb2640d3202c04d89163340d8e7854, type: 3}
+      propertyPath: m_Layer
+      value: 11
+      objectReference: {fileID: 0}
     - target: {fileID: 5329491899755964388, guid: 1ebb2640d3202c04d89163340d8e7854, type: 3}
       propertyPath: m_LocalPosition.x
       value: 8
@@ -146,6 +150,14 @@ PrefabInstance:
     - target: {fileID: 5329491899755964388, guid: 1ebb2640d3202c04d89163340d8e7854, type: 3}
       propertyPath: m_LocalEulerAnglesHint.z
       value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 6542161949576889915, guid: 1ebb2640d3202c04d89163340d8e7854, type: 3}
+      propertyPath: m_Layer
+      value: 11
+      objectReference: {fileID: 0}
+    - target: {fileID: 7681507612019541413, guid: 1ebb2640d3202c04d89163340d8e7854, type: 3}
+      propertyPath: m_Layer
+      value: 11
       objectReference: {fileID: 0}
     - target: {fileID: 9217462460067735731, guid: 1ebb2640d3202c04d89163340d8e7854, type: 3}
       propertyPath: m_Size.x

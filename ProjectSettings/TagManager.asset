@@ -9,6 +9,8 @@ TagManager:
   - Button
   - Ennemy
   - CheckPoint
+  - Coin
+  - Trap
   layers:
   - Default
   - TransparentFX

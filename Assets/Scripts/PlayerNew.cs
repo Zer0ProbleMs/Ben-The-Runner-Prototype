@@ -1,3 +1,4 @@
+using System;
 using System.Collections;
 using UnityEngine;
 using UnityEngine.InputSystem;
@@ -6,8 +7,10 @@ public class PlayerNew : MonoBehaviour
 {
     [Header("GameObjects Import")] 
     public Rigidbody2D rb;
-
+    public ParticleSystem walkFX;
+    
     private Animator _animator;
+    private GameObject _coin;
     
     [Header("Movement Properties")] 
     public float defaultSpeed = 5f;
@@ -68,6 +71,16 @@ public class PlayerNew : MonoBehaviour
     public float playerScale;
     private bool _isFacingRight;
 
+    [Header("Spawn")] 
+    public float spawnTimer = 1f;
+
+    [Header("Respawn")] 
+    public Vector2 spawnPoint;
+    public float mapLimit = -20f;
+
+    [Header("Player Help")] 
+    public float coyoteTime = 0.2f;
+
     private void Awake()
     {
         _animator = GetComponent<Animator>();
@@ -76,6 +89,7 @@ public class PlayerNew : MonoBehaviour
     private void Start()
     {
         _movementSpeed = defaultSpeed;
+        spawnPoint = gameObject.transform.position;
     }
 
     // FixedUpdate updates every 50 frames
@@ -87,16 +101,24 @@ public class PlayerNew : MonoBehaviour
         WallCheck();
         WallJump();
         Animations();
-        
+        Spawn();
+        FallDeath();
+        Effects();
         if (_isDashing) Dashing();
         
-        if (!isWallJumping && !_isDashing)
+        if (!isWallJumping && !_isDashing && spawnTimer <= 0)
         {
             Movement();
             FlipChar();
         }
     }
 
+    private void Effects()
+    {
+        if (Mathf.Abs(rb.linearVelocityX) > 0 && isGrounded) walkFX.Play();
+        else walkFX.Pause();
+    }
+    
     public void MoveInput(InputAction.CallbackContext context)
     {
         _horizontalInput = context.ReadValue<Vector2>().x; // Takes the input on the X axis so Q and D
@@ -235,7 +257,7 @@ public class PlayerNew : MonoBehaviour
         {
             isWallJumping = false;
             wallJumpDirection = -transform.localScale.x;
-            wallJumpTimer = wallJumpTime;
+            wallJumpTimer = coyoteTime;
             CancelInvoke();
         }
         else if (wallJumpTimer > 0f) wallJumpTimer -= Time.deltaTime;
@@ -260,6 +282,26 @@ public class PlayerNew : MonoBehaviour
     {
         rb.linearVelocity = new Vector2(transform.localScale.x * dashPower, 0);
     }
+    
+    private void Spawn()
+    {
+        spawnTimer -= Time.deltaTime;
+        if (spawnTimer <= 0) spawnTimer = 0;
+    }
+
+    private void Respawn()
+    {
+        spawnTimer = 0.25f;
+        gameObject.transform.position = spawnPoint;
+    }
+
+    private void FallDeath()
+    {
+        if (gameObject.transform.position.y <= mapLimit)
+        {
+            Respawn();
+        }
+    }
 
     private void FlipChar()
     {
@@ -272,13 +314,24 @@ public class PlayerNew : MonoBehaviour
         }
     }
 
+    private void OnCollisionEnter2D(Collision2D other)
+    {
+        if (other.gameObject.CompareTag("Trap"))
+        {
+            Respawn();
+        }
+    }
+
     private void Animations()
     {
-        _animator.SetFloat("Horizontal Speed", Mathf.Abs(_horizontalInput));
+        _animator.SetFloat("Horizontal Speed", Mathf.Abs(rb.linearVelocityX));
         _animator.SetFloat("Vertical Speed", rb.linearVelocityY);
+        _animator.SetInteger("Jumps", _jumpRemaining);
         _animator.SetBool("IsGrounded", isGrounded);
         _animator.SetBool("IsRunning", _isRunning);
         _animator.SetBool("IsJumping", _isJumping);
+        _animator.SetBool("IsWallSliding", isWalled);
+        _animator.SetBool("IsWallJumping", isWallJumping);
     }
 
     private void OnDrawGizmosSelected()

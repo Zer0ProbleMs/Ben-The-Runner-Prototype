@@ -93,3 +93,4 @@ MonoBehaviour:
   m_EditorClassIdentifier: '::'
   Cinemachine: {fileID: 0}
   defaultzoom: 9
+  biggerzoom: 5
